@@ -1,0 +1,48 @@
+body{
+    background: black;
+    color: white;
+}
+#kontener{
+    border: solid white 1px;
+    border-radius: 20px;
+}
+
+#rejestracja {
+    display: flex;
+    flex-direction: row;
+    margin: 30px;
+}
+
+#labels{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+#inputs{
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.form-label {
+    padding: 20px;
+    font-size: 20px;
+}
+
+.form-input{
+    margin: 15px;
+    font-size: 20px;
+    border-radius: 20px;
+    width: 50%;
+}
+#submitBtn{
+    text-align: center;
+    align-items: center;
+    width: 200px;
+    height: 80px;
+    border: none;
+    font-size: 20px;
+    border-radius: 20px;
+    background: lightgreen;
+    color: white;
+}
