@@ -4,10 +4,18 @@ const Logowanie = ({kontrola}) => {
 
     const [login , setLogin] = useState("")
     const [haslo , setHaslo] = useState("")
+    const [nieprawidlowe, setNieprawidlowe] = useState("")
    const logowanie = (e) =>{
         e.preventDefault()
-        console.log(login , haslo);
-        kontrola(true)
+/*        console.log(login , haslo);
+        console.log(localStorage.getItem("login") , localStorage.getItem("haslo"))*/
+        if(login == localStorage.getItem("login") && haslo == localStorage.getItem("haslo")) {
+            kontrola(true)
+            setNieprawidlowe("")
+        }
+        else{
+            setNieprawidlowe("Login lub haslo jest nie prawidlowe")
+        }
    }
 
     return (
@@ -26,6 +34,7 @@ const Logowanie = ({kontrola}) => {
                     <button type="submit" id="submitBtn">ZALOGUJ</button>
                 </form>
             </div>
+            <h2>{nieprawidlowe}</h2>
         </>
     )
 }

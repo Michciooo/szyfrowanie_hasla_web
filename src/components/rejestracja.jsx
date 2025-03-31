@@ -10,8 +10,9 @@ const Rejestracja = ({czyZarejestrowany}) => {
         e.preventDefault();
         console.log(login , email , haslo)
         czyZarejestrowany(true)
+        localStorage.setItem("login",login)
+        localStorage.setItem("haslo",haslo)
     }
-
     return(
         <>
             <h1><b>Nie masz jeszcze konta? Zarejestruj się !</b></h1>

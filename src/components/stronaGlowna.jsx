@@ -6,7 +6,6 @@ const StronaGlowna = () => {
     const [wyswietlKodowanie, setWyswietlKodowanie] = useState(false)
     const [passwords, setPasswords] = useState([])
     const[codedPasswords, setCodedPasswords] = useState([])
-
     const szyfr = (e) =>{
         e.preventDefault()
         setPasswords(prevPasswords => [...prevPasswords, pass])
@@ -15,44 +14,65 @@ const StronaGlowna = () => {
         setWyswietlKodowanie(true)
     }
 
-    const kodowanie = () =>{
-        passwords.map(password => {
-            let zakodowaneSlowo = ""
-            password.split("").map(litera => {
-                let kodAscii = litera.charCodeAt()
-                if((kodAscii>=65 && kodAscii<=90) || (kodAscii>=97 && kodAscii<=122))
-                {
-                    kodAscii += 8
-                    if((kodAscii>=82 && kodAscii<=90) || kodAscii>=124)
-                    {
-                        kodAscii -=28
-                        let zakodowanaLitera = String.fromCharCode(kodAscii);
-                        zakodowaneSlowo += zakodowanaLitera;
-                    }
-                    else
-                    {
-                        let zakodowanaLitera = String.fromCharCode(kodAscii)
-                        zakodowaneSlowo += zakodowanaLitera;
-                    }
-                }
-            })
-            console.log(zakodowaneSlowo)
-            setCodedPasswords(prevPasswords => [...prevPasswords, zakodowaneSlowo])
+    const shiftChar = (char, shift, lowerBound, upperBound) => {
+        let newCode = char.charCodeAt(0) + shift;
+
+        if (newCode > upperBound) {
+            newCode = lowerBound + (newCode - upperBound - 1);
+        } else if (newCode < lowerBound) {
+            newCode = upperBound - (lowerBound - newCode - 1);
         }
-        )
-    }
 
-    const dekodowanie = (zakodowaneHaslo) =>{
-        codedPasswords.map(codedPassword => {
+        return String.fromCharCode(newCode);
+    };
 
+    const kodowanie = () => {
+        const przesuniecie = 8;
+
+        const zakodowaneHasla = passwords.map(password => {
+            return password.split("").map(litera => {
+                if (litera >= "A" && litera <= "Z") {
+                    return shiftChar(litera, przesuniecie, 65, 90);
+                } else if (litera >= "a" && litera <= "z") {
+                    return shiftChar(litera, przesuniecie, 97, 122);
+                }
+                return litera;
+            }).join("");
+        });
+
+        console.log(zakodowaneHasla);
+        setCodedPasswords(zakodowaneHasla);
+
+        codedPasswords.map((password, index) => {
+            localStorage.setItem(index.toString(), password);
+            localStorage.setItem("len", codedPasswords.length);
         })
     }
 
+    const dekodowanie = () => {
+        const przesuniecie = -8;
+
+        const odkodowaneHasla = codedPasswords.map(zakodowaneHaslo => {
+            return zakodowaneHaslo.split("").map(litera => {
+                if (litera >= "A" && litera <= "Z") {
+                    return shiftChar(litera, przesuniecie, 65, 90);
+                } else if (litera >= "a" && litera <= "z") {
+                    return shiftChar(litera, przesuniecie, 97, 122);
+                }
+                return litera;
+            }).join("");
+        });
+
+        console.log(odkodowaneHasla);
+        setCodedPasswords(odkodowaneHasla);
+        setWyswietlKodowanie(false)
+    };
     useEffect(() => {
         if (passwords.length > 0) {
             kodowanie();
         }
     }, [passwords]);
+
     return (
         <>
             <h1>STRONA GŁÓWNA</h1>
@@ -65,10 +85,16 @@ const StronaGlowna = () => {
             </div>
             {codedPasswords.map(codedPassword => {return(
                 <div>
-                    <h2>{codedPassword}</h2>
-                    <button type={"button"} onClick={()=> dekodowanie()}>DEKKODUJ</button>
+                    <h2>Zakodowane hasło : {codedPassword}</h2>
                 </div>
             )})}
+            {wyswietlKodowanie ? <button type={"button"} onClick={()=> dekodowanie()}>DEKKODUJ</button> : null}
+            <div>
+                <h2>Lista zakodowanych haseł: </h2>
+                {codedPasswords.map((password, index) => (
+                    <h3 key={index}>{password}</h3>
+                ))}
+            </div>
         </>
     )
 }
