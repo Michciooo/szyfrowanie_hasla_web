@@ -1,18 +1,18 @@
 import {useState} from "react";
 
-const Logowanie = ({kontrola}) => {
+const Logowanie = ({kontrola , setLogowanie}) => {
 
     const [login , setLogin] = useState("")
     const [haslo , setHaslo] = useState("")
     const [nieprawidlowe, setNieprawidlowe] = useState("")
    const logowanie = (e) =>{
         e.preventDefault()
-/*        console.log(login , haslo);
-        console.log(localStorage.getItem("login") , localStorage.getItem("haslo"))*/
-        if(login == localStorage.getItem("login") && haslo == localStorage.getItem("haslo")) {
-            kontrola(true)
-            setNieprawidlowe("")
-        }
+       if (login === localStorage.getItem("login") && haslo === localStorage.getItem("haslo")) {
+           localStorage.setItem("currentUser", login);
+           kontrola(true);
+           setNieprawidlowe("");
+           setLogowanie(true);
+       }
         else{
             setNieprawidlowe("Login lub haslo jest nie prawidlowe")
         }

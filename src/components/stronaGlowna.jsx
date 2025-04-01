@@ -1,17 +1,22 @@
 import {useEffect, useState} from "react";
 import "./stronaGlowna.css"
 import Rejestracja from "./rejestracja.jsx";
-const StronaGlowna = () => {
+import Logowanie from "./logowanie.jsx";
+const StronaGlowna = ({logowanie , setKontrola}) => {
     const [pass, setPass] = useState("")
     const [wyswietlKodowanie, setWyswietlKodowanie] = useState(false)
     const [passwords, setPasswords] = useState([])
-    const[codedPasswords, setCodedPasswords] = useState([])
-    const[codedPasswordsConst, setCodedPasswordsConst] = useState([])
+    const [codedPasswords, setCodedPasswords] = useState([])
+    const [codedPasswordsConst, setCodedPasswordsConst] = useState([])
+    const [ListedCodedPasswords, setListedCodedPasswords] = useState([])
+    const [originalCodedPasswords, setOriginalCodedPasswords] = useState([]);
+
     const szyfr = (e) =>{
         e.preventDefault()
         setPasswords(prevPasswords => [...prevPasswords, pass])
         setPass("")
         kodowanie()
+        zakodowaneStale()
         setWyswietlKodowanie(true)
     }
 
@@ -29,7 +34,6 @@ const StronaGlowna = () => {
 
     const kodowanie = () => {
         const przesuniecie = 8;
-
         const zakodowaneHasla = passwords.map(password => {
             return password.split("").map(litera => {
                 if (litera >= "A" && litera <= "Z") {
@@ -43,17 +47,16 @@ const StronaGlowna = () => {
 
         console.log(zakodowaneHasla);
         setCodedPasswords(zakodowaneHasla);
-        zakodowaneStale()
+        setListedCodedPasswords([...zakodowaneHasla]);
 
-        codedPasswords.map((password, index) => {
-            localStorage.setItem(index.toString(), password);
-            localStorage.setItem("len", codedPasswords.length);
-        })
-    }
+        // Zapisz zakodowane hasła, żeby mogły być przywrócone
+        setOriginalCodedPasswords([...zakodowaneHasla]);  // <---- Zapisz zakodowane hasła
+    };
+
+
 
     const zakodowaneStale = () =>{
         const przesuniecie = 8;
-        let tablicaZakodowanychTeraz = []
         const zakodowaneHasla = passwords.map(password => {
             return password.split("").map(litera => {
                 if (litera >= "A" && litera <= "Z") {
@@ -66,11 +69,14 @@ const StronaGlowna = () => {
         });
         setCodedPasswordsConst(...[zakodowaneHasla])
         console.log(zakodowaneHasla);
-        
     }
 
     const dekodowanie = () => {
         const przesuniecie = -8;
+
+        if (originalCodedPasswords.length === 0) {
+            setOriginalCodedPasswords([...codedPasswords]); // 🔹 Zapisujemy oryginalne zakodowane hasła
+        }
 
         const odkodowaneHasla = codedPasswords.map(zakodowaneHaslo => {
             return zakodowaneHaslo.split("").map(litera => {
@@ -83,15 +89,48 @@ const StronaGlowna = () => {
             }).join("");
         });
 
-        console.log(odkodowaneHasla);
         setCodedPasswords(odkodowaneHasla);
-        setWyswietlKodowanie(false)
+        setWyswietlKodowanie(false);
     };
+    const przywrocZakodowane = () => {
+        if (originalCodedPasswords.length > 0) {
+            setCodedPasswords([...originalCodedPasswords]);
+            setWyswietlKodowanie(true);
+        }
+    };
+    const wyloguj = () => {
+        setKontrola(false);
+    };
+
+
     useEffect(() => {
         if (passwords.length > 0) {
             kodowanie();
         }
     }, [passwords]);
+
+    useEffect(() => {
+        const savedPasswords = [];
+        const length = localStorage.getItem("len");
+
+        if (length) {
+            for (let i = 0; i < length; i++) {
+                let password = localStorage.getItem(i.toString());
+                if (password) savedPasswords.push(password);
+            }
+            setCodedPasswords(savedPasswords);
+            setListedCodedPasswords(savedPasswords);
+        }
+    }, []);
+
+    useEffect(() => {
+        const currentUser = localStorage.getItem("currentUser");
+        if (!currentUser) return;
+
+        const savedPasswords = JSON.parse(localStorage.getItem(`passwords_${currentUser}`)) || [];
+        setCodedPasswords(savedPasswords);
+        setListedCodedPasswords(savedPasswords);
+    }, []);
 
     return (
         <>
@@ -103,15 +142,18 @@ const StronaGlowna = () => {
                     <button onClick={szyfr} id={"btnSubmit"} >ZAMIEN</button>
                 </form>
             </div>
+            <button onClick={wyloguj} id={"wylogujBtn"}>WYLOGUJ</button>
+            <h2>Zakodowane haslo : </h2>
             {codedPasswords.map(codedPassword => {return(
-                <div>
-                    <h2>Zakodowane hasło : {codedPassword}</h2>
-                </div>
+                <h3>{codedPassword}</h3>
             )})}
             {wyswietlKodowanie ? <button type={"button"} onClick={()=> dekodowanie()}>DEKKODUJ</button> : null}
             <div>
                 <h2>Lista zakodowanych haseł: </h2>
-                {codedPasswordsConst.map((password, index) => (
+                {!wyswietlKodowanie && originalCodedPasswords.length > 0 ? (
+                    <button type={"button"} onClick={przywrocZakodowane}>PRZYWRÓĆ ZAKODOWANE</button>
+                ) : null}
+                {ListedCodedPasswords.map((password, index) => (
                     <h3 key={index}>{password}</h3>
                 ))}
             </div>
