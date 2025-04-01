@@ -6,6 +6,7 @@ const StronaGlowna = () => {
     const [wyswietlKodowanie, setWyswietlKodowanie] = useState(false)
     const [passwords, setPasswords] = useState([])
     const[codedPasswords, setCodedPasswords] = useState([])
+    const[codedPasswordsConst, setCodedPasswordsConst] = useState([])
     const szyfr = (e) =>{
         e.preventDefault()
         setPasswords(prevPasswords => [...prevPasswords, pass])
@@ -42,11 +43,30 @@ const StronaGlowna = () => {
 
         console.log(zakodowaneHasla);
         setCodedPasswords(zakodowaneHasla);
+        zakodowaneStale()
 
         codedPasswords.map((password, index) => {
             localStorage.setItem(index.toString(), password);
             localStorage.setItem("len", codedPasswords.length);
         })
+    }
+
+    const zakodowaneStale = () =>{
+        const przesuniecie = 8;
+        let tablicaZakodowanychTeraz = []
+        const zakodowaneHasla = passwords.map(password => {
+            return password.split("").map(litera => {
+                if (litera >= "A" && litera <= "Z") {
+                    return shiftChar(litera, przesuniecie, 65, 90);
+                } else if (litera >= "a" && litera <= "z") {
+                    return shiftChar(litera, przesuniecie, 97, 122);
+                }
+                return litera;
+            }).join("");
+        });
+        setCodedPasswordsConst(...[zakodowaneHasla])
+        console.log(zakodowaneHasla);
+        
     }
 
     const dekodowanie = () => {
@@ -91,7 +111,7 @@ const StronaGlowna = () => {
             {wyswietlKodowanie ? <button type={"button"} onClick={()=> dekodowanie()}>DEKKODUJ</button> : null}
             <div>
                 <h2>Lista zakodowanych haseł: </h2>
-                {codedPasswords.map((password, index) => (
+                {codedPasswordsConst.map((password, index) => (
                     <h3 key={index}>{password}</h3>
                 ))}
             </div>
