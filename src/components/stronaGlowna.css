@@ -1,0 +1,33 @@
+body{
+    background: black;
+    color: white;
+}
+#kontener{
+    border: solid white 1px;
+    border-radius: 20px;
+    margin: 30px;
+    padding: 10px;
+}
+
+#input{
+    border: solid white 1px;
+    border-radius: 20px;
+    margin: 30px;
+    padding: 10px;
+    background-color: white;
+    color: black;   
+}
+#button{
+
+}
+.button{
+    text-align: center;
+    align-items: center;
+    width: 200px;
+    height: 80px;
+    border: none;
+    font-size: 20px;
+    border-radius: 20px;
+    background: lightgreen;
+    color: white;
+}

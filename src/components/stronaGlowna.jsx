@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import "./stronaGlowna.css"
 import Rejestracja from "./rejestracja.jsx";
 import Logowanie from "./logowanie.jsx";
-const StronaGlowna = ({logowanie , setKontrola}) => {
+const StronaGlowna = ({setKontrola}) => {
     const [pass, setPass] = useState("")
     const [wyswietlKodowanie, setWyswietlKodowanie] = useState(false)
     const [passwords, setPasswords] = useState([])
@@ -13,11 +13,17 @@ const StronaGlowna = ({logowanie , setKontrola}) => {
 
     const szyfr = (e) =>{
         e.preventDefault()
-        setPasswords(prevPasswords => [...prevPasswords, pass])
+        const updatedPasswords = [...passwords, pass];
+        setPasswords(updatedPasswords);
         setPass("")
         kodowanie()
         zakodowaneStale()
         setWyswietlKodowanie(true)
+
+        const currentUser = localStorage.getItem("currentUser");
+        if (currentUser) {
+            localStorage.setItem(`passwords_${currentUser}`, JSON.stringify(updatedPasswords));
+        }
     }
 
     const shiftChar = (char, shift, lowerBound, upperBound) => {
@@ -49,8 +55,7 @@ const StronaGlowna = ({logowanie , setKontrola}) => {
         setCodedPasswords(zakodowaneHasla);
         setListedCodedPasswords([...zakodowaneHasla]);
 
-        // Zapisz zakodowane hasła, żeby mogły być przywrócone
-        setOriginalCodedPasswords([...zakodowaneHasla]);  // <---- Zapisz zakodowane hasła
+        setOriginalCodedPasswords([...zakodowaneHasla]);
     };
 
 
@@ -110,48 +115,37 @@ const StronaGlowna = ({logowanie , setKontrola}) => {
     }, [passwords]);
 
     useEffect(() => {
-        const savedPasswords = [];
-        const length = localStorage.getItem("len");
-
-        if (length) {
-            for (let i = 0; i < length; i++) {
-                let password = localStorage.getItem(i.toString());
-                if (password) savedPasswords.push(password);
-            }
-            setCodedPasswords(savedPasswords);
-            setListedCodedPasswords(savedPasswords);
-        }
-    }, []);
-
-    useEffect(() => {
         const currentUser = localStorage.getItem("currentUser");
         if (!currentUser) return;
 
         const savedPasswords = JSON.parse(localStorage.getItem(`passwords_${currentUser}`)) || [];
+
+        setPasswords(savedPasswords);
         setCodedPasswords(savedPasswords);
         setListedCodedPasswords(savedPasswords);
+        setOriginalCodedPasswords(savedPasswords);
     }, []);
 
     return (
         <>
             <h1>STRONA GŁÓWNA</h1>
-            <div>
+            <div id={"kontener"}>
                 <form>
                     <label htmlFor={"haslo"}>Hasło :</label>
-                    <input id={"haslo"} onChange={(e) => setPass(e.target.value)} value={pass} minLength={8} placeholder={"haslo"} type={"text"}/>
-                    <button onClick={szyfr} id={"btnSubmit"} >ZAMIEN</button>
+                    <input id={"input"} onChange={(e) => setPass(e.target.value)} value={pass} minLength={8} placeholder={"haslo"} type={"text"}/>
+                    <button onClick={szyfr} className={"button"} id={"button"} >ZAMIEN</button>
                 </form>
             </div>
-            <button onClick={wyloguj} id={"wylogujBtn"}>WYLOGUJ</button>
+            <button onClick={wyloguj} className={"button"}>WYLOGUJ</button>
             <h2>Zakodowane haslo : </h2>
             {codedPasswords.map(codedPassword => {return(
                 <h3>{codedPassword}</h3>
             )})}
-            {wyswietlKodowanie ? <button type={"button"} onClick={()=> dekodowanie()}>DEKKODUJ</button> : null}
-            <div>
+            {wyswietlKodowanie ? <button className={"button"} type={"button"} onClick={()=> dekodowanie()}>DEKKODUJ</button> : null}
+            <div id={"kontener"}>
                 <h2>Lista zakodowanych haseł: </h2>
                 {!wyswietlKodowanie && originalCodedPasswords.length > 0 ? (
-                    <button type={"button"} onClick={przywrocZakodowane}>PRZYWRÓĆ ZAKODOWANE</button>
+                    <button type={"button"} className={"button"} onClick={przywrocZakodowane}>PRZYWRÓĆ ZAKODOWANE</button>
                 ) : null}
                 {ListedCodedPasswords.map((password, index) => (
                     <h3 key={index}>{password}</h3>

@@ -10,7 +10,7 @@ function App() {
     const [pierwszeLogowanie,setPierwszeLogowanie] = useState(false)
   return (
     <>
-        {kontrolowanieDwochOkien ? <StronaGlowna logowanie={pierwszeLogowanie} setKontrola={setKontrolowanieDwochOkien} />
+        {kontrolowanieDwochOkien ? <StronaGlowna  setKontrola={setKontrolowanieDwochOkien} />
             : <div><Rejestracja czyZarejestrowany={setCzyZalogowany}/>
             {czyZalogowany ? <Logowanie kontrola={setKontrolowanieDwochOkien} setLogowanie={setPierwszeLogowanie}/> : false}</div>}
     </>

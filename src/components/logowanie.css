@@ -22,6 +22,7 @@ body{
     display: flex;
     flex-direction: column;
     width: 50%;
+    border: 1px solid white;
 }
 
 .form-label {

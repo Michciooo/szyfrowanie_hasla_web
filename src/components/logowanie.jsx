@@ -5,18 +5,22 @@ const Logowanie = ({kontrola , setLogowanie}) => {
     const [login , setLogin] = useState("")
     const [haslo , setHaslo] = useState("")
     const [nieprawidlowe, setNieprawidlowe] = useState("")
-   const logowanie = (e) =>{
-        e.preventDefault()
-       if (login === localStorage.getItem("login") && haslo === localStorage.getItem("haslo")) {
-           localStorage.setItem("currentUser", login);
-           kontrola(true);
-           setNieprawidlowe("");
-           setLogowanie(true);
-       }
-        else{
-            setNieprawidlowe("Login lub haslo jest nie prawidlowe")
+    const logowanie = (e) => {
+        e.preventDefault();
+
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const znaleziony = users.find(u => u.login === login && u.haslo === haslo);
+        if (znaleziony) {
+            localStorage.setItem("currentUser", login);
+            kontrola(true);
+            setNieprawidlowe("");
+            setLogowanie(true);
+        } else {
+            setNieprawidlowe("Login lub hasło jest nieprawidłowe");
         }
-   }
+    };
+
 
     return (
         <>

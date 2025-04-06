@@ -6,13 +6,30 @@ const Rejestracja = ({czyZarejestrowany}) => {
     const [haslo , setHaslo] = useState("")
     const [email , setEmail] = useState("")
 
-    const register = (e) =>{
+    const register = (e) => {
         e.preventDefault();
-        console.log(login , email , haslo)
-        czyZarejestrowany(true)
-        localStorage.setItem("login",login)
-        localStorage.setItem("haslo",haslo)
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const istnieje = users.find(u => u.login === login);
+        setLogin("")
+        setEmail("")
+        setHaslo("")
+        if (istnieje) {
+            alert("Użytkownik o tym loginie już istnieje.");
+            return;
+        }
+
+        users.push({
+            login,
+            haslo,
+            email
+        });
+
+        localStorage.setItem("users", JSON.stringify(users));
+        czyZarejestrowany(true);
+        console.log("Zarejestrowani użytkownicy:", users);
     }
+
     return(
         <>
             <h1><b>Nie masz jeszcze konta? Zarejestruj się !</b></h1>
